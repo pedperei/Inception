@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  # MariaDB service configuration
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb/  # Specify the build context for MariaDB
+    env_file:
+      .env
+    volumes:
+      - mariadb_volume:/var/lib/mysql  # Mount MariaDB data volume for persistent storage
+    networks:
+      - inception_network
+    restart: on-failure  # Restart the container on failure for reliability
+
+  # Nginx service configuration
+  nginx:
+    image: nginx
+    container_name: nginx
+    build:
+      context: ./requirements/nginx/  # Specify the build context for Nginx
+    depends_on:
+      - wordpress  # Ensure Nginx starts only after WordPress container is up
+    ports:
+      - 443:443  # Map host port 443 to container port 443
+    env_file:
+      .env
+    volumes:
+      - wordpress_volume:/var/www/html/  # Mount WordPress volume for Nginx to serve
+    networks:
+      - inception_network
+    restart: on-failure  # Restart the container on failure for reliability
+
+  # WordPress service configuration
+  wordpress:
+    image: wordpress
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress/  # Specify the build context for WordPress
+    depends_on:
+      - mariadb  # Ensure WordPress starts only after MariaDB container is up
+    env_file:
+      .env
+    volumes:
+      - wordpress_volume:/var/www/html  # Mount WordPress data volume for persistent storage
+    networks:
+      - inception_network
+    restart: on-failure  # Restart the container on failure for reliability
+
+networks:
+  inception_network:
+    name: inception_network  # Define a custom network for communication between services
+    driver: bridge
+
+volumes:
+  mariadb_volume:
+    name: mariadb
+    driver_opts:
+      device: /home/pedperei/data/mysql
+      o: bind # Use bind mount to link a host directory to the container
+      type: none # No specific volume driver
+  wordpress_volume:
+    name: wordpress
+    driver_opts:
+      device: /home/pedperei/data/wordpress
+      o: bind # Use bind mount to link a host directory to the container
+      type: none # No specific volume driver
