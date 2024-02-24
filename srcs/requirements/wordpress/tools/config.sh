@@ -30,12 +30,6 @@ wp core install --allow-root \
                --admin_password="$WP_ADMIN_PASSWORD" \
                --admin_email="$WP_ADMIN_EMAIL" \
 
-wp user create --allow-root \
-                "$WP_SECOND_USER" \
-                "$WP_SECOND_USER_EMAIL" \
-                --role=author \
-                --user_pass="$WP_SECOND_USER_PASSWORD" \
-
 
 chown -R www-data:www-data /var/www/html
 
