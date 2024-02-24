@@ -1,69 +1,69 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  # MariaDB service configuration
   mariadb:
     image: mariadb
     container_name: mariadb
     build:
-      context: ./requirements/mariadb/  # Specify the build context for MariaDB
-    env_file:
-      .env
+      context: ./requirements/mariadb/
+      dockerfile: Dockerfile
     volumes:
-      - mariadb_volume:/var/lib/mysql  # Mount MariaDB data volume for persistent storage
+      - mariadb_data:/var/lib/mysql
     networks:
-      - inception_network
-    restart: on-failure  # Restart the container on failure for reliability
+      - inception
+    restart: "on-failure"
+    env_file:
+      - .env
 
-  # Nginx service configuration
   nginx:
     image: nginx
     container_name: nginx
     build:
-      context: ./requirements/nginx/  # Specify the build context for Nginx
-    depends_on:
-      - wordpress  # Ensure Nginx starts only after WordPress container is up
+      context: ./requirements/nginx/
+      dockerfile: Dockerfile
     ports:
-      - 443:443  # Map host port 443 to container port 443
-    env_file:
-      .env
+      - 443:443
     volumes:
-      - wordpress_volume:/var/www/html/  # Mount WordPress volume for Nginx to serve
+      - wordpress_data:/var/www/html
     networks:
-      - inception_network
-    restart: on-failure  # Restart the container on failure for reliability
+      - inception
+    depends_on:
+      - wordpress
+    restart: "on-failure"
+    env_file:
+      - .env
 
-  # WordPress service configuration
   wordpress:
     image: wordpress
     container_name: wordpress
     build:
-      context: ./requirements/wordpress/  # Specify the build context for WordPress
-    depends_on:
-      - mariadb  # Ensure WordPress starts only after MariaDB container is up
-    env_file:
-      .env
+      context: ./requirements/wordpress/
+      dockerfile: Dockerfile
     volumes:
-      - wordpress_volume:/var/www/html  # Mount WordPress data volume for persistent storage
+      - wordpress_data:/var/www/html
     networks:
-      - inception_network
-    restart: on-failure  # Restart the container on failure for reliability
+      - inception
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    restart: "on-failure"
+
 
 networks:
-  inception_network:
-    name: inception_network  # Define a custom network for communication between services
-    driver: bridge
+  inception:
+    name: inception
 
 volumes:
-  mariadb_volume:
-    name: mariadb
+  mariadb_data:
+    name: mariadb_data
     driver_opts:
+      type: none
       device: /home/pedperei/data/mysql
-      o: bind # Use bind mount to link a host directory to the container
-      type: none # No specific volume driver
-  wordpress_volume:
-    name: wordpress
+      o: bind
+  wordpress_data:
+    name: wordpress_data
     driver_opts:
+      type: none
       device: /home/pedperei/data/wordpress
-      o: bind # Use bind mount to link a host directory to the container
-      type: none # No specific volume driver
+      o: bind

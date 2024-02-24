@@ -1,57 +1,59 @@
-# Name of the project
-NAME = inception
+COMPOSE_FILE := ./srcs/docker-compose.yml
+HOME := /home/pedperei
 
-# Build the Docker containers defined in the docker-compose.yml file
+all:
+	@echo "Usage: make [up|down|clean|clean-re|up-volumes|stop|fclean|delete_folders|images_clean|restart|volume_clean|container_clean|prune|connect|re-up]"
+
 build:
-# -f: Specify an alternate compose file
-# --build: Build images before starting containers
-# -d: Detached mode: Run containers in the background
-	docker-compose -f srcs/docker-compose.yml up -d --build
+	sudo docker-compose -f $(COMPOSE_FILE) build
+	sudo mkdir -p $(HOME)/data/mysql
+	sudo mkdir -p $(HOME)/data/wordpress
 
-# Stop and remove the Docker containers defined in the docker-compose.yml file
+build-up: build up
+
+up:
+	sudo docker-compose -f $(COMPOSE_FILE) up
+
 down:
-	docker-compose -f srcs/docker-compose.yml down
+	sudo docker-compose -f $(COMPOSE_FILE) down
 
-start:
-	docker-compose -f srcs/docker-compose.yml start
+down-volumes:
+	sudo docker-compose -f $(COMPOSE_FILE) down -v
+
+clean: images_clean
+	sudo docker-compose -f $(COMPOSE_FILE) down -v --remove-orphans
 
 stop:
-	docker-compose -f srcs/docker-compose.yml stop
+	sudo docker-compose -f $(COMPOSE_FILE) stop
 
-clean:
-	docker-compose -f srcs/docker-compose.yml down --volumes --rmi all
+fclean: delete_folders 
+	sudo docker stop $$(sudo docker ps -qa)  # Stop all containers
+	sudo docker rm $$(sudo docker ps -qa) # Remove all containers
+	sudo docker rmi -f $$(sudo docker images -qa) # Remove all images
+	sudo docker volume rm $$(sudo docker volume ls -q) # Remove all volumes
+	sudo docker network rm $$(sudo docker network ls -q) 2>/dev/null # Remove all networks
 
-fclean: clean
-# prune: Remove unused data
-# -a: Remove all unused images not just dangling ones
-# --volumes: Prune volumes
-# --force: Do not prompt for confirmation
-	docker system prune -a --volumes --force
-	docker network ls -q -f "driver=custom" | xargs -r docker network rm 2>/dev/null
-	sudo rm -rf /home/pedperei/data/mysql/*
-	sudo rm -rf /home/pedperei/data/wordpress/*
+delete_folders:
+	sudo rm -rf $(HOME)/data/mysql
+	sudo rm -rf $(HOME)/data/wordpress
 
-re: fclean build
+images_clean:
+	sudo docker rmi $$(sudo docker images -q)
 
-info:
-	@echo "Containers:"
-	@docker ps -a
-	@echo "------------------------------------------------------------"
-	@echo "Images:"
-	@docker images -a
-	@echo "------------------------------------------------------------"
-	@echo "Volumes:"
-	@docker volume ls
-	@echo "------------------------------------------------------------"
-	@echo "Networks:"
-	@docker network ls
-	@echo "------------------------------------------------------------"
+restart: down up
 
-connect-mariadb:
-	docker exec -it mariadb mysql -u root -p
+volume_clean:
+	sudo docker volume rm $$(sudo docker volume ls -qf dangling=true)
 
-connect-wordpress:
-	docker exec -it wordpress /bin/bash
+container_clean:
+	sudo docker rm $$(sudo docker ps -qa --no-trunc --filter "status=exited")
 
-# Declare the targets as phony to avoid conflicts with file names
-.PHONY: build up down clean fclean re info connect
+prune:
+	sudo docker system prune -a
+
+connect:
+	sudo docker exec -it mariadb mysql -u root -p
+
+re-up: down fclean build-up
+
+.PHONY: up down clean clean-re up-volumes stop fclean delete_folders images_clean restart volume_clean container_clean prune connect_mariadb re-up
