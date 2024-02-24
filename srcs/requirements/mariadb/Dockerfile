@@ -5,10 +5,10 @@ FROM debian:bullseye-slim
 RUN apt-get update && apt-get install -y mariadb-server
 
 # Copy the custom MariaDB initialization script to the home directory
-COPY /conf/maria.sh /home
+COPY /conf/maria_db.sh /home
 
 # Give execute permissions to the MariaDB initialization script
-RUN chmod 777 /home/maria.sh
+RUN chmod 777 /home/maria_db.sh
 
 # Initialize MariaDB database
 RUN mysql_install_db

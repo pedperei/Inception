@@ -13,6 +13,6 @@ RUN openssl req -newkey rsa:4096 -x509 -sha256 -days 365 -nodes \
     -out /etc/nginx/ssl/pedperei.crt \
     -subj "/C=PT/ST=Lisboa/L=Lisboa/O=42Lisboa/OU=pedperei/CN=localhost/"
 
-COPY /conf/nginx.conf /etc/nginx/conf.d
+COPY /conf/default.conf /etc/nginx/default.d
 
 CMD ["nginx", "-g", "daemon off;"]
