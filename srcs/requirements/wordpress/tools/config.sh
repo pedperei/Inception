@@ -10,6 +10,19 @@ if [ -e "/var/www/html/wp-config.php" ]; then
     exec "$@"
 fi
 
+# Install WP-CLI
+curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+chmod +x wp-cli.phar && \
+mv wp-cli.phar /usr/local/bin/wp
+
+
+if wp --info &> /dev/null; then \
+        echo "WP-CLI was installed successfully."; \
+    else \
+        echo "WP-CLI installation failed."; \
+        exit 1; \
+    fi
+
 cd "$WP_PATH"
 
 # Set up WordPress
