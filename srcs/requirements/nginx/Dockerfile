@@ -13,5 +13,7 @@ COPY ./conf/nginx.conf /etc/nginx/conf.d
 COPY ./tools/nginx.sh /home/nginx.sh
 RUN chmod 777 /home/nginx.sh
 
+CMD ["nginx", "-g", "daemon off;"]
+
 # Start Nginx using the script
 ENTRYPOINT ["/home/nginx.sh"]

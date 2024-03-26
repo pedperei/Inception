@@ -20,7 +20,4 @@ else
     echo "SSL certificate and key already exist. Skipping generation."
 fi
 
-# Start Nginx
-nginx -g "daemon off;"
-
 exec "$@"
