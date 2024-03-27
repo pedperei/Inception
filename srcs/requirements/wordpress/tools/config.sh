@@ -26,7 +26,7 @@ if wp --info &> /dev/null; then \
 cd "$WP_PATH"
 
 # Set up WordPress
-wp core download --allow-root \
+wp core download --version=5.9.3 --force --allow-root
 
 
 wp config create --allow-root \
