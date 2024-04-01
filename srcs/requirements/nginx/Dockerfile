@@ -15,9 +15,5 @@ COPY ./tools/nginx.sh /home/nginx.sh
 # Change the permissions of the shell script to make it executable
 RUN chmod 777 /home/nginx.sh
 
-# Specify the command to run when the container starts
-# This command starts NGINX and keeps it running in the foreground
-CMD ["nginx", "-g", "daemon off;"]
-
 # Specify the entrypoint script to run when the container starts
 ENTRYPOINT ["/home/nginx.sh"]

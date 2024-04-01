@@ -27,6 +27,3 @@ RUN chmod 777 /home/config.sh
 
 # Set the configuration script as the entrypoint, i.e., the command that will be run when the Docker container is started
 ENTRYPOINT ["/home/config.sh"]
-
-# Set the PHP FastCGI Process Manager as the command that will be run after the entrypoint, with the -F flag to keep it running in the foreground
-CMD ["php-fpm7.4", "-F"]

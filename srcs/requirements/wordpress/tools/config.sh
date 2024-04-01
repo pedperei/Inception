@@ -48,4 +48,7 @@ chown -R www-data:www-data /var/www/html
 
 echo "WordPress installed and configured successfully"
 
+# Run PHP FastCGI Process Manager in the foreground
+php-fpm7.4 -F
+
 exec "$@"
