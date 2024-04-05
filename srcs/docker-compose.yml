@@ -1,69 +1,104 @@
+# Specify the Docker Compose file version
 version: '3.8'
 
-services:
-  mariadb:
-    image: mariadb
-    container_name: mariadb
-    build:
-      context: ./requirements/mariadb/
-      dockerfile: Dockerfile
-    volumes:
-      - mariadb_data:/var/lib/mysql
-    networks:
-      - inception
-    restart: "on-failure"
-    env_file:
-      - .env
-
-  nginx:
-    image: nginx
-    container_name: nginx
-    build:
-      context: ./requirements/nginx/
-      dockerfile: Dockerfile
-    ports:
-      - 443:443
-    volumes:
-      - wordpress_data:/var/www/html
-    networks:
-      - inception
-    depends_on:
-      - wordpress
-    restart: "on-failure"
-    env_file:
-      - .env
-
-  wordpress:
-    image: wordpress
-    container_name: wordpress
-    build:
-      context: ./requirements/wordpress/
-      dockerfile: Dockerfile
-    volumes:
-      - wordpress_data:/var/www/html
-    networks:
-      - inception
-    depends_on:
-      - mariadb
-    env_file:
-      - .env
-    restart: "on-failure"
-
-
+# Define networks
 networks:
+  # Create a network named 'inception' using the bridge driver
+  # bridge driver is the default driver and is used to create a network that is isolated from the host network
   inception:
     name: inception
+    driver: bridge
 
+# Define volumes
 volumes:
+  # Create a volume named 'mariadb_data' and bind it to a local directory
   mariadb_data:
     name: mariadb_data
     driver_opts:
-      type: none
       device: /home/pedperei/data/mysql
       o: bind
+      type: bind
+  # Create a volume named 'wordpress_data' and bind it to a local directory
   wordpress_data:
     name: wordpress_data
     driver_opts:
-      type: none
       device: /home/pedperei/data/wordpress
       o: bind
+      type: bind
+
+# Define services
+services:
+  # Define a service named 'mariadb'
+  mariadb:
+    # Use the 'mariadb' Docker image
+    image: mariadb
+    # Name the container 'mariadb'
+    container_name: mariadb
+    # Build the Docker image using the specified Dockerfile
+    build:
+      context: ./requirements/mariadb/
+      dockerfile: Dockerfile
+    # Mount the 'mariadb_data' volume to '/var/lib/mysql' in the container
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    # Connect the container to the 'inception' network
+    networks:
+      - inception
+    # Load environment variables from the '.env' file
+    env_file:
+      - .env
+    # Restart the container if it fails
+    restart: on-failure
+
+  # Define a service named 'nginx'
+  nginx:
+    # Use the 'nginx' Docker image
+    image: nginx
+    # Name the container 'nginx'
+    container_name: nginx
+    # Build the Docker image using the specified Dockerfile
+    build:
+      context: ./requirements/nginx/
+      dockerfile: Dockerfile
+    # Map port 443 in the container to port 443 on the host
+    ports:
+      - 443:443
+    # Mount the 'wordpress_data' volume to '/var/www/html' in the container
+    volumes:
+      - wordpress_data:/var/www/html
+    # Connect the container to the 'inception' network
+    networks:
+      - inception
+    # Start the container after the 'wordpress' service is started
+    depends_on:
+      - wordpress
+    # Load environment variables from the '.env' file
+    env_file:
+      - .env
+    # Restart the container if it fails
+    restart: on-failure
+
+  # Define a service named 'wordpress'
+  wordpress:
+    # Use the 'wordpress' Docker image
+    image: wordpress
+    # Name the container 'wordpress'
+    container_name: wordpress
+    # Build the Docker image using the specified Dockerfile
+    build:
+      context: ./requirements/wordpress/
+      dockerfile: Dockerfile
+    # Mount the 'wordpress_data' volume to '/var/www/html' in the container
+    volumes:
+      - wordpress_data:/var/www/html
+    # Connect the container to the 'inception' network
+    networks:
+      - inception
+    # Start the container after the 'mariadb' service is started
+    depends_on:
+      - mariadb
+    # Load environment variables from the '.env' file
+    env_file:
+      - .env
+    # Restart the container if it fails
+    restart: on-failure
