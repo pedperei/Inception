@@ -22,7 +22,7 @@ fclean:
 re: fclean build up
 
 logs:
-	docker-compose -f $(YML_PATH) logs
+	docker compose -f $(YML_PATH) logs
 
 info-docker:
 	docker compose -f $(YML_PATH) ps
@@ -33,6 +33,12 @@ info-volume:
 info-network:
 	docker network ls
 
+inspect-mariadb:
+	docker volume inspect mariadb_data
+
+inspect-wordpress:
+	docker volume inspect wordpress_data
+
 connect-mariadb:
 	docker exec -it mariadb mysql -u root -p
 
@@ -40,4 +46,4 @@ connect-wordpress:
 	docker exec -it wordpress /bin/bash
 
 # Declare the targets as phony to avoid conflicts with file names
-.PHONY: all build up down fclean re logs info-docker info-volume info-network connect-mariadb connect-wordpress
+.PHONY: all build up down fclean re logs info-docker info-volume info-network inspect-mariadb inspect-wordpress connect-mariadb connect-wordpress
