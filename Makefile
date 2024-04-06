@@ -6,7 +6,7 @@ build:
 	docker-compose -f $(YML_PATH) build
 
 up:
-	docker-compose -f $(YML_PATH) up -d
+	docker-compose -f $(YML_PATH) up
 
 down:
 	docker-compose -f $(YML_PATH) down
