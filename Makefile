@@ -11,13 +11,18 @@ up:
 down:
 	docker-compose -f $(YML_PATH) down
 
-fclean:
+clean:
+	docker-compose -f  $(YML_PATH) down --volumes --rmi all
+
+fclean: clean
 	docker system prune -a --volumes --force
 	if [ "$$(docker ps -qa)" ]; then docker stop $$(docker ps -qa); fi
 	if [ "$$(docker ps -qa)" ]; then docker rm $$(docker ps -qa); fi
 	if [ "$$(docker images -qa)" ]; then docker rmi -f $$(docker images -qa); fi
-	if [ "$$(docker volume ls -q)" ]; then docker volume rm $$(docker volume ls -q); fi
+	if [ "$$(docker volume ls -q)" ]; then docker volume rm $$(docker volume ls -qf dangling=true); fi
 	if [ "$$(docker network ls -q --filter type=custom)" ]; then docker network rm $$(docker network ls -q --filter type=custom); fi
+	sudo rm -rf /home/pedperei/data/mysql/*
+	sudo rm -rf /home/pedperei/data/wordpress/*
 
 re: fclean build up
 

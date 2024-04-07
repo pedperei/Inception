@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     mariadb-client \
     php-fpm \
-    php-mysql 
+    php-mysql && rm -rf /var/lib/apt/lists/*
 
 # Copy the WordPress configuration file into the PHP configuration directory in the Docker image
 COPY ./conf/wordpress.conf /etc/php/7.4/fpm/pool.d/wordpress.conf
@@ -26,4 +26,4 @@ COPY ./tools/config.sh /home/config.sh
 RUN chmod 777 /home/config.sh
 
 # Set the configuration script as the entrypoint, i.e., the command that will be run when the Docker container is started
-ENTRYPOINT ["/home/config.sh"]
+CMD ["/home/config.sh"]
