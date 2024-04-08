@@ -10,7 +10,7 @@ then
     echo "Database already exists."
 else
     # If the database doesn't exist, start the MariaDB service
-    service mariadb start
+    mysqld_safe &
 
     # Wait until the MariaDB service is up and running
     while ! mysqladmin ping -hlocalhost --silent; do

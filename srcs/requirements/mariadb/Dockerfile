@@ -13,8 +13,5 @@ COPY /tools/maria_db.sh /home
 # Give execute permissions to the MariaDB initialization script
 RUN chmod 777 /home/maria_db.sh
 
-RUN mysql_install_db
-
-# ENTRYPOINT sets the main command to be executed when the container starts.
-# The provided script at /home/maria.sh will be the entry point
-ENTRYPOINT ["/home/maria_db.sh"]
+# CMD sets the main command to be executed when the container starts.
+CMD ["/home/maria_db.sh"]
