@@ -12,9 +12,15 @@ else
     # If the database doesn't exist, start the MariaDB service
     mysqld_safe &
 
-    # Wait until the MariaDB service is up and running
+    # Wait until the MariaDB service is up and running (added counter to prevent infinite loop)
+    counter=0
     while ! mysqladmin ping -hlocalhost --silent; do
         sleep 1
+        counter=$((counter+1))
+        if [ $counter -ge 60 ]; then
+            echo "MySQL server is not responding after 60 attempts. Exiting..."
+            exit 1
+        fi
     done
 
     # Secure the MariaDB installation
